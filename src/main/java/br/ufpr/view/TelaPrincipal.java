@@ -4,6 +4,11 @@
  */
 package br.ufpr.view;
 
+
+import br.ufpr.dao.AgendaDAO;
+import br.ufpr.modelo.Agenda;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableRowSorter;
 /**
  *
  * @author ander
@@ -15,6 +20,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
      */
     public TelaPrincipal() {
         initComponents();
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        model.setNumRows(0);
+        jTable2.setRowSorter(new TableRowSorter(model));
+        readTabela();
     }
 
     /**
@@ -66,6 +75,11 @@ public class TelaPrincipal extends javax.swing.JFrame {
         jLabel4.setText("Telefone");
 
         jbSalvar.setText("Salvar");
+        jbSalvar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbSalvarActionPerformed(evt);
+            }
+        });
 
         jbExcluir.setText("Excluir");
 
@@ -154,6 +168,37 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jbSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSalvarActionPerformed
+                                    
+        Agenda a = new Agenda();
+        AgendaDAO dao = new AgendaDAO();
+        a.setNome(jtNome.getText());
+        a.setSobrenome(jtSobrenome.getText());
+        a.setTelefone(jtTelefone.getText()); //Se fosse inteiro teria que converter: Integer.parseInt(jtTelefone.getText())
+        dao.create(a);
+        jtNome.setText("");
+        jtSobrenome.setText("");
+        jtTelefone.setText("");
+        readTabela();        // TODO add your handling code here:
+    }//GEN-LAST:event_jbSalvarActionPerformed
+
+
+    public void readTabela() {
+        DefaultTableModel model = (DefaultTableModel) jTable2.getModel();
+        model.setNumRows(0);
+        AgendaDAO dao = new AgendaDAO();
+
+        for (Agenda a : dao.read()) {
+            model.addRow(new Object[]{
+                a.getId(),
+                a.getNome(),
+                a.getSobrenome(),
+                a.getTelefone()
+            });
+        }
+
+    }
 
     /**
      * @param args the command line arguments
