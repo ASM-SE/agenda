@@ -12,7 +12,6 @@ public class Agenda {
     private int id;
     private String nome;
     private String sobrenome;
-     private String telefone;
 
     public int getId() {
         return id;
@@ -45,7 +44,7 @@ public class Agenda {
     public void setTelefone(String telefone) {
         this.telefone = telefone;
     }
-   
+    private String telefone;
 }
 
 
