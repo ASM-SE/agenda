@@ -7,6 +7,7 @@ package br.ufpr.view;
 
 import br.ufpr.dao.AgendaDAO;
 import br.ufpr.modelo.Agenda;
+import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableRowSorter;
 /**
@@ -74,6 +75,10 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
         jLabel4.setText("Telefone");
 
+        jtId.setEditable(false);
+        jtId.setEnabled(false);
+        jtId.setFocusable(false);
+
         jbSalvar.setText("Salvar");
         jbSalvar.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -82,8 +87,18 @@ public class TelaPrincipal extends javax.swing.JFrame {
         });
 
         jbExcluir.setText("Excluir");
+        jbExcluir.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbExcluirActionPerformed(evt);
+            }
+        });
 
         jbAlterar.setText("Alterar");
+        jbAlterar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jbAlterarActionPerformed(evt);
+            }
+        });
 
         jTable2.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -102,6 +117,19 @@ public class TelaPrincipal extends javax.swing.JFrame {
 
             public boolean isCellEditable(int rowIndex, int columnIndex) {
                 return canEdit [columnIndex];
+            }
+        });
+        jTable2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable2MouseClicked(evt);
+            }
+        });
+        jTable2.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTable2KeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTable2KeyReleased(evt);
             }
         });
         jScrollPane2.setViewportView(jTable2);
@@ -170,19 +198,87 @@ public class TelaPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jbSalvarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbSalvarActionPerformed
-                                    
-        Agenda a = new Agenda();
-        AgendaDAO dao = new AgendaDAO();
-        a.setNome(jtNome.getText());
-        a.setSobrenome(jtSobrenome.getText());
-        a.setTelefone(jtTelefone.getText()); //Se fosse inteiro teria que converter: Integer.parseInt(jtTelefone.getText())
-        dao.create(a);
+        if(jTable2.getValueAt(jTable2.getSelectedRow(), 0).toString().isEmpty()){
+            Agenda a = new Agenda();
+            AgendaDAO dao = new AgendaDAO();
+            a.setNome(jtNome.getText());
+            a.setSobrenome(jtSobrenome.getText());
+            a.setTelefone(jtTelefone.getText()); //Se fosse inteiro teria que converter: Integer.parseInt(jtTelefone.getText())         
+            dao.create(a);
+        }
         jtNome.setText("");
         jtSobrenome.setText("");
         jtTelefone.setText("");
         readTabela();        // TODO add your handling code here:
     }//GEN-LAST:event_jbSalvarActionPerformed
 
+    private void jTable2KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable2KeyReleased
+        selecionaColuna();
+    }//GEN-LAST:event_jTable2KeyReleased
+
+    private void jTable2KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable2KeyPressed
+        selecionaColuna();
+    }//GEN-LAST:event_jTable2KeyPressed
+
+    private void jTable2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable2MouseClicked
+        selecionaColuna();
+    }//GEN-LAST:event_jTable2MouseClicked
+
+    private void jbAlterarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbAlterarActionPerformed
+        if(jTable2.getSelectedRow() != -1){
+            Agenda a = new Agenda();
+            AgendaDAO dao = new AgendaDAO();
+            a.setNome(jtNome.getText());
+            a.setSobrenome(jtSobrenome.getText());
+            a.setTelefone(jtTelefone.getText()); //Se fosse inteiro teria que converter: Integer.parseInt(jtTelefone.getText())
+            a.setId(Integer.parseInt(jtId.getText())); //Poderia ser passado o campo selecionado da tabela: jTable2.getValueAt(jTable2.getSelectedRow(), 0)) sem o toString() mas tem que fazer cast (int) para garantir
+            dao.update(a);
+            jtId.setText("");        
+            jtNome.setText("");
+            jtSobrenome.setText("");
+            jtTelefone.setText("");
+            readTabela();   
+        } else {
+            JOptionPane.showMessageDialog(null, "Selecione o registro para alterar!");
+        }
+    }//GEN-LAST:event_jbAlterarActionPerformed
+
+    private void jbExcluirActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jbExcluirActionPerformed
+        if(jTable2.getSelectedRow() != -1){    
+        
+        int dialogButton = JOptionPane.OK_CANCEL_OPTION;
+        int dialogResult = JOptionPane.showConfirmDialog(this, "Confirma Exclusão?", "Excluir", dialogButton);
+        if(dialogResult == 0) {
+            Agenda a = new Agenda();
+            AgendaDAO dao = new AgendaDAO();
+            a.setId(Integer.parseInt(jtId.getText())); //Poderia ser passado o campo selecionado da tabela: jTable2.getValueAt(jTable2.getSelectedRow(), 0)) sem o toString() mas tem que fazer cast (int) para garantir
+            dao.delete(a);
+            jtId.setText("");        
+            jtNome.setText("");
+            jtSobrenome.setText("");
+            jtTelefone.setText("");
+            readTabela();          
+        } else {
+            jtId.setText("");        
+            jtNome.setText("");
+            jtSobrenome.setText("");
+            jtTelefone.setText("");
+        } 
+
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Selecione o registro para excluir!");
+        }
+    }//GEN-LAST:event_jbExcluirActionPerformed
+
+    public void selecionaColuna(){
+        if(jTable2.getSelectedRow() != -1){
+            jtId.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 0).toString()); //Cada numero é uma coluna e começa com zero
+            jtNome.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 1).toString());
+            jtSobrenome.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 2).toString());
+            jtTelefone.setText(jTable2.getValueAt(jTable2.getSelectedRow(), 3).toString());
+        }
+    }
 
     public void readTabela() {
         DefaultTableModel model = (DefaultTableModel) jTable2.getModel();

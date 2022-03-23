@@ -25,7 +25,7 @@ public class AgendaDAO {
     public void create(Agenda a){
     Connection con = ConnectionFactory.getConnection();
     PreparedStatement stmt = null;
-
+        
         try {
             stmt = con.prepareStatement("INSERT INTO agenda (nome, sobrenome,"
             + " telefone) VALUES (?,?,?)");
@@ -66,6 +66,44 @@ public class AgendaDAO {
         }
          return agendas;
 
-}
+    }
+
+    public void update(Agenda a){
+    Connection con = ConnectionFactory.getConnection();
+    PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement("UPDATE agenda SET nome = ?, sobrenome = ?, telefone = ? WHERE id = ?");
+            stmt.setString(1, a.getNome());
+            stmt.setString(2, a.getSobrenome());
+            stmt.setString(3, a.getTelefone());
+            stmt.setInt(4, a.getId());
+            stmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Registro alterado com sucesso!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao atualizar! Mensagem de erro:" + e);
+        } finally {
+            ConnectionFactory.closeConnection(con, stmt);
+        }
+    }
+
+
+    public void delete(Agenda a){
+    Connection con = ConnectionFactory.getConnection();
+    PreparedStatement stmt = null;
+
+        try {
+            stmt = con.prepareStatement("DELETE FROM agenda WHERE id = ?");
+            stmt.setInt(1, a.getId());
+            stmt.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Registro excluído com sucesso!");
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(null, "Erro ao excluir! Mensagem de erro:" + e);
+        } finally {
+            ConnectionFactory.closeConnection(con, stmt);
+        }
+    }
+
+
 
 }
